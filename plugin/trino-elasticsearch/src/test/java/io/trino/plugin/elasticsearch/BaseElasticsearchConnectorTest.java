@@ -29,6 +29,7 @@ import io.trino.tpch.TpchTable;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.intellij.lang.annotations.Language;
@@ -1925,15 +1926,17 @@ public abstract class BaseElasticsearchConnectorTest
     {
         String json = new ObjectMapper().writeValueAsString(document);
         String endpoint = format("%s?refresh", indexEndpoint(index, String.valueOf(System.nanoTime())));
+        final Request request = new Request("PUT", endpoint);
+        request.setEntity(new NStringEntity(json, ContentType.APPLICATION_JSON));
         client.getLowLevelClient()
-                .performRequest("PUT", endpoint, ImmutableMap.of(), new NStringEntity(json, ContentType.APPLICATION_JSON));
+                .performRequest(request);
     }
 
     private void addAlias(String index, String alias)
             throws IOException
     {
         client.getLowLevelClient()
-                .performRequest("PUT", format("/%s/_alias/%s", index, alias));
+                .performRequest(new Request("PUT", format("/%s/_alias/%s", index, alias)));
 
         refreshIndex(alias);
     }
@@ -1943,28 +1946,30 @@ public abstract class BaseElasticsearchConnectorTest
     private void createIndex(String indexName)
             throws IOException
     {
-        client.getLowLevelClient().performRequest("PUT", "/" + indexName);
+        client.getLowLevelClient().performRequest(new Request("PUT", "/" + indexName));
     }
 
     private void createIndex(String indexName, @Language("JSON") String properties)
             throws IOException
     {
         String mappings = indexMapping(properties);
+        final Request request = new Request("PUT", "/" + indexName);
+        request.setEntity(new NStringEntity(mappings, ContentType.APPLICATION_JSON));
         client.getLowLevelClient()
-                .performRequest("PUT", "/" + indexName, ImmutableMap.of(), new NStringEntity(mappings, ContentType.APPLICATION_JSON));
+                .performRequest(request);
     }
 
     private void refreshIndex(String index)
             throws IOException
     {
         client.getLowLevelClient()
-                .performRequest("GET", format("/%s/_refresh", index));
+                .performRequest(new Request("GET", format("/%s/_refresh", index)));
     }
 
     private void deleteIndex(String indexName)
             throws IOException
     {
         client.getLowLevelClient()
-                .performRequest("DELETE", "/" + indexName);
+                .performRequest(new Request("DELETE", "/" + indexName));
     }
 }

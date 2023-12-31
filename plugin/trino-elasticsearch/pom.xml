@@ -15,7 +15,7 @@
 
     <properties>
         <air.main.basedir>${project.parent.basedir}</air.main.basedir>
-        <dep.elasticsearch.version>6.8.23</dep.elasticsearch.version>
+        <dep.elasticsearch.version>7.17.16</dep.elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -112,9 +112,10 @@
         </dependency>
 
         <dependency>
+            <!-- elasticsearch-rest-client:7.17.16 asked for it -->
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpasyncclient</artifactId>
-            <version>4.1.2</version>
+            <version>4.1.4</version>
             <exclusions>
                 <!-- Brings in duplicate classes already in org.slf4j:jcl-over-slf4j (from io.airlift:log-manager) -->
                 <exclusion>
@@ -158,6 +159,10 @@
                     <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </exclusion>
                 <!-- trino-main brings in 8.4.1 (vs 7.7.3) -->
                 <exclusion>
                     <groupId>org.apache.lucene</groupId>
@@ -172,6 +177,7 @@
         </dependency>
 
         <dependency>
+            <!--import TimeValue-->
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch-core</artifactId>
             <version>${dep.elasticsearch.version}</version>
@@ -187,6 +193,7 @@
                     <artifactId>snakeyaml</artifactId>
                 </exclusion>
             </exclusions>
+            <!--<scope>test</scope> why ?? -->
         </dependency>
 
         <dependency>
@@ -203,6 +210,7 @@
         </dependency>
 
         <dependency>
+            <!--The High Level REST Client is deprecated in favour of the Java API Client.-->
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>${dep.elasticsearch.version}</version>
